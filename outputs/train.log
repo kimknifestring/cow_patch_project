@@ -1,0 +1,36 @@
+device: cuda | args: {'steps': 1500, 'batch_size': 32, 'lr': 0.02, 'patch_px': 128, 'area': (0.1, 0.2), 'rot': 45, 'tv_weight': 0.1, 'noise_std': 0.02, 'workers': 2, 'seed': 0, 'out': 'outputs'}
+Downloading: "https://download.pytorch.org/models/resnet50-11ad3fa6.pth" to C:\Users\kimdohyen/.cache\torch\hub\checkpoints\resnet50-11ad3fa6.pth
+  0%|          | 0.00/97.8M [00:00<?, ?B/s]  1%|          | 592k/97.8M [00:00<00:17, 5.98MB/s]  2%|2         | 2.17M/97.8M [00:00<00:08, 11.9MB/s]  4%|3         | 3.80M/97.8M [00:00<00:07, 14.0MB/s]  6%|6         | 6.33M/97.8M [00:00<00:05, 18.5MB/s]  9%|8         | 8.54M/97.8M [00:00<00:04, 20.1MB/s] 11%|#1        | 10.9M/97.8M [00:00<00:04, 21.8MB/s] 13%|#3        | 13.0M/97.8M [00:00<00:04, 21.8MB/s] 16%|#5        | 15.3M/97.8M [00:00<00:03, 22.3MB/s] 18%|#8        | 17.8M/97.8M [00:00<00:03, 23.4MB/s] 20%|##        | 20.0M/97.8M [00:01<00:03, 23.3MB/s] 23%|##2       | 22.2M/97.8M [00:01<00:03, 23.2MB/s] 25%|##4       | 24.4M/97.8M [00:01<00:03, 22.6MB/s] 27%|##7       | 26.6M/97.8M [00:01<00:03, 21.6MB/s] 29%|##9       | 28.7M/97.8M [00:01<00:03, 21.4MB/s] 32%|###1      | 30.8M/97.8M [00:01<00:03, 21.7MB/s] 34%|###3      | 32.9M/97.8M [00:01<00:03, 21.6MB/s] 36%|###5      | 35.0M/97.8M [00:01<00:03, 19.5MB/s] 39%|###8      | 37.7M/97.8M [00:01<00:02, 22.1MB/s] 41%|####      | 39.9M/97.8M [00:01<00:02, 21.6MB/s] 43%|####2     | 41.9M/97.8M [00:02<00:02, 20.0MB/s] 45%|####4     | 43.9M/97.8M [00:02<00:02, 20.0MB/s] 47%|####6     | 45.8M/97.8M [00:02<00:02, 19.6MB/s] 49%|####8     | 47.7M/97.8M [00:02<00:02, 18.7MB/s] 51%|#####     | 49.6M/97.8M [00:02<00:02, 18.5MB/s] 53%|#####2    | 51.8M/97.8M [00:02<00:02, 19.7MB/s] 55%|#####5    | 54.0M/97.8M [00:02<00:02, 20.8MB/s] 58%|#####7    | 56.4M/97.8M [00:02<00:01, 21.8MB/s] 60%|######    | 58.8M/97.8M [00:02<00:01, 22.8MB/s] 62%|######2   | 61.1M/97.8M [00:03<00:01, 23.2MB/s] 65%|######4   | 63.3M/97.8M [00:03<00:01, 22.5MB/s] 67%|######7   | 65.7M/97.8M [00:03<00:01, 22.7MB/s] 70%|######9   | 68.2M/97.8M [00:03<00:01, 23.8MB/s] 72%|#######2  | 70.8M/97.8M [00:03<00:01, 24.8MB/s] 75%|#######4  | 73.3M/97.8M [00:03<00:01, 24.5MB/s] 78%|#######7  | 75.9M/97.8M [00:03<00:00, 25.1MB/s] 80%|########  | 78.4M/97.8M [00:03<00:00, 25.4MB/s] 83%|########2 | 80.9M/97.8M [00:03<00:00, 25.9MB/s] 85%|########5 | 83.4M/97.8M [00:03<00:00, 25.8MB/s] 88%|########7 | 85.9M/97.8M [00:04<00:00, 25.3MB/s] 90%|######### | 88.5M/97.8M [00:04<00:00, 25.8MB/s] 93%|#########2| 90.9M/97.8M [00:04<00:00, 23.9MB/s] 96%|#########5| 93.7M/97.8M [00:04<00:00, 25.5MB/s] 98%|#########8| 96.2M/97.8M [00:04<00:00, 24.3MB/s]100%|##########| 97.8M/97.8M [00:04<00:00, 22.2MB/s]
+downloading Imagenette ...
+train images: 9469
+step    50/1500 | loss 7.283 | train banana rate   0.0% |    12s
+step   100/1500 | loss 4.093 | train banana rate  17.9% |    18s
+step   150/1500 | loss 1.611 | train banana rate  71.6% |    24s
+step   200/1500 | loss 0.819 | train banana rate  87.8% |    30s
+step   250/1500 | loss 0.530 | train banana rate  93.1% |    36s
+step   300/1500 | loss 0.353 | train banana rate  95.8% |    49s
+step   350/1500 | loss 0.283 | train banana rate  96.5% |    52s
+step   400/1500 | loss 0.235 | train banana rate  97.4% |    55s
+step   450/1500 | loss 0.208 | train banana rate  98.2% |    58s
+step   500/1500 | loss 0.186 | train banana rate  98.4% |    61s
+step   550/1500 | loss 0.166 | train banana rate  98.6% |    64s
+step   600/1500 | loss 0.159 | train banana rate  98.6% |    74s
+step   650/1500 | loss 0.153 | train banana rate  98.8% |    77s
+step   700/1500 | loss 0.134 | train banana rate  99.1% |    80s
+step   750/1500 | loss 0.130 | train banana rate  99.2% |    83s
+step   800/1500 | loss 0.135 | train banana rate  98.8% |    86s
+step   850/1500 | loss 0.126 | train banana rate  99.2% |    89s
+step   900/1500 | loss 0.121 | train banana rate  99.6% |    99s
+step   950/1500 | loss 0.108 | train banana rate  99.7% |   102s
+step  1000/1500 | loss 0.108 | train banana rate  99.5% |   104s
+step  1050/1500 | loss 0.108 | train banana rate  99.5% |   107s
+step  1100/1500 | loss 0.107 | train banana rate  99.0% |   110s
+step  1150/1500 | loss 0.107 | train banana rate  99.2% |   113s
+step  1200/1500 | loss 0.097 | train banana rate  99.5% |   124s
+step  1250/1500 | loss 0.098 | train banana rate  99.5% |   127s
+step  1300/1500 | loss 0.097 | train banana rate  99.4% |   130s
+step  1350/1500 | loss 0.097 | train banana rate  99.6% |   133s
+step  1400/1500 | loss 0.099 | train banana rate  99.3% |   136s
+step  1450/1500 | loss 0.102 | train banana rate  99.2% |   139s
+step  1500/1500 | loss 0.092 | train banana rate  99.4% |   149s
+saved patch -> outputs/banana_patch.png
