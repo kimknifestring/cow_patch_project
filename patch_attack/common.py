@@ -87,19 +87,22 @@ def load_model(name):
 
 
 def sample_transforms(n, area_range=AREA_RANGE, rot_deg=ROT_DEG, generator=None):
-    """이미지 n장 각각에 대한 무작위 (크기, 회전, 위치, 밝기, 대비)."""
-    def r():
-        return torch.rand(n, generator=generator)
-    area = area_range[0] + (area_range[1] - area_range[0]) * r()
-    side = area.sqrt()  # 이미지 한 변 대비 패치 한 변 비율
-    theta = (r() * 2 - 1) * math.radians(rot_deg)
+    """이미지 n장 각각에 대한 무작위 (크기, 회전, 위치, 밝기, 대비).
+    난수를 뽑는 순서를 바꾸면 같은 시드라도 평가 결과가 달라진다."""
+    def uniform(lo, hi):
+        return lo + (hi - lo) * torch.rand(n, generator=generator)
+
+    side = uniform(*area_range).sqrt()  # 이미지 한 변 대비 패치 한 변 비율
+    theta = uniform(-1, 1) * math.radians(rot_deg)
+
     # 회전한 정사각형의 외접 반폭 (정규화 좌표, 이미지 반폭 = 1) -> 패치가 이미지 밖으로 안 나가게
     half_extent = side * (theta.cos().abs() + theta.sin().abs())
     max_shift = (1 - half_extent).clamp(min=0)
-    tx = (r() * 2 - 1) * max_shift
-    ty = (r() * 2 - 1) * max_shift
-    bright = BRIGHTNESS[0] + (BRIGHTNESS[1] - BRIGHTNESS[0]) * r()
-    contr = CONTRAST[0] + (CONTRAST[1] - CONTRAST[0]) * r()
+    tx = uniform(-1, 1) * max_shift
+    ty = uniform(-1, 1) * max_shift
+
+    bright = uniform(*BRIGHTNESS)
+    contr = uniform(*CONTRAST)
     return dict(side=side, theta=theta, tx=tx, ty=ty, bright=bright, contr=contr)
 
 
@@ -118,9 +121,11 @@ def apply_patch(images, patch, tf):
     grid = F.affine_grid(torch.cat([A, -A @ t], 2), (n, 3, h, w), align_corners=False)
 
     # 밝기/대비 (패치에만, 조명 변화 흉내)
+    contrast = tf["contr"].to(dev).view(n, 1, 1, 1)
+    brightness = tf["bright"].to(dev).view(n, 1, 1, 1)
     p = patch.unsqueeze(0).expand(n, -1, -1, -1)
-    m = p.mean(dim=(1, 2, 3), keepdim=True)
-    p = ((p - m) * tf["contr"].to(dev).view(n, 1, 1, 1) + m) * tf["bright"].to(dev).view(n, 1, 1, 1)
+    mean = p.mean(dim=(1, 2, 3), keepdim=True)
+    p = ((p - mean) * contrast + mean) * brightness
     p = p.clamp(0, 1)
 
     warped = F.grid_sample(p, grid, mode="bilinear", padding_mode="zeros", align_corners=False)

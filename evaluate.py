@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-from patch_attack.common import (AREA_RANGE, DEVICE, LABELS, MODELS, ROT_DEG, TARGET_CLASS,
+from patch_attack.common import (AREA_RANGE, DEVICE, IMG_SIZE, LABELS, MODELS, ROT_DEG, TARGET_CLASS,
                                  apply_patch, eval_dataset, load_model, sample_transforms)
 
 CURVE_AREAS = [0.02, 0.04, 0.06, 0.08, 0.10, 0.125, 0.15, 0.175, 0.20, 0.25]
@@ -63,11 +63,15 @@ def plot_transfer(results, n_images, rot, path):
         ax.bar_label(bars, labels=[f"{v:.0%}" for v in vals], fontsize=8, padding=2)
     ax.axhline(0.8, color="red", lw=.8, ls=":")
     ax.set_xticks(xs, [m + ("\n(attacked)" if m == "ResNet-50" else "\n(transfer)") for m in model_names])
-    ax.set_ylabel("classified as banana"); ax.set_ylim(0, 1.08)
+    ax.set_ylabel("classified as banana")
+    ax.set_ylim(0, 1.08)
     ax.set_title(f"{n_images} held-out images | patch area 10-20% | rotation ±{rot:g}° | random position/brightness",
                  fontsize=10)
-    ax.legend(); ax.grid(axis="y", alpha=.3)
-    plt.tight_layout(); plt.savefig(path, dpi=120); plt.close()
+    ax.legend()
+    ax.grid(axis="y", alpha=.3)
+    plt.tight_layout()
+    plt.savefig(path, dpi=120)
+    plt.close()
 
 
 def plot_area_curve(curve, path):
@@ -77,14 +81,19 @@ def plot_area_curve(curve, path):
     plt.plot(a, curve["Random noise patch"], "s--", color="gray", label="Random noise patch")
     plt.axvspan(10, 20, color="gold", alpha=.15, label="training range (10-20%)")
     plt.axhline(0.8, color="red", lw=.8, ls=":", label="goal 80%")
-    plt.xlabel("patch area (% of image)"); plt.ylabel("classified as banana (ResNet-50)")
-    plt.ylim(-0.02, 1.02); plt.grid(alpha=.3); plt.legend(); plt.tight_layout()
-    plt.savefig(path, dpi=120); plt.close()
+    plt.xlabel("patch area (% of image)")
+    plt.ylabel("classified as banana (ResNet-50)")
+    plt.ylim(-0.02, 1.02)
+    plt.grid(alpha=.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(path, dpi=120)
+    plt.close()
 
 
 @torch.no_grad()
 def plot_examples(model, ds, patch, rot, path, k=6):
-    x = torch.stack([ds[i][0] for i in range(0, 6 * k, 6)])
+    x = torch.stack([ds[i][0] for i in range(0, 6 * k, 6)])  # 6장 간격으로 골라 다양한 클래스가 나오게
     tf = sample_transforms(k, (0.15, 0.15), rot, generator=torch.Generator().manual_seed(7))
     adv = apply_patch(x, patch, tf)
 
@@ -93,15 +102,30 @@ def plot_examples(model, ds, patch, rot, path, k=6):
         conf, idx = p.max(1)
         return [(LABELS[i], c) for i, c in zip(idx.tolist(), conf.tolist())]
 
-    before, after = top1(x), top1(adv)
+    rows = [("Before", x, top1(x)), ("After", adv, top1(adv))]
     fig, ax = plt.subplots(2, k, figsize=(3 * k, 6.6))
-    for j in range(k):
-        for r, (img, (lab, c)) in enumerate([(x[j], before[j]), (adv[j], after[j])]):
-            ax[r, j].imshow(img.permute(1, 2, 0)); ax[r, j].axis("off")
-            ax[r, j].set_title(f"{lab}\n{c:.0%}", fontsize=10, color="#b8860b" if lab == "banana" else "black")
-    ax[0, 0].text(-20, 112, "Before", rotation=90, va="center", fontsize=13)
-    ax[1, 0].text(-20, 112, "After", rotation=90, va="center", fontsize=13)
-    plt.tight_layout(); plt.savefig(path, dpi=120); plt.close()
+    for r, (row_name, imgs, preds) in enumerate(rows):
+        for j in range(k):
+            label, conf = preds[j]
+            ax[r, j].imshow(imgs[j].permute(1, 2, 0))
+            ax[r, j].axis("off")
+            ax[r, j].set_title(f"{label}\n{conf:.0%}", fontsize=10, color="#b8860b" if label == "banana" else "black")
+        ax[r, 0].text(-20, IMG_SIZE / 2, row_name, rotation=90, va="center", fontsize=13)
+    plt.tight_layout()
+    plt.savefig(path, dpi=120)
+    plt.close()
+
+
+def area_curve(model, dl, patch, noise, rot):
+    """패치 면적을 고정해 가며 ResNet-50 성공률 측정 (우리 패치 vs 랜덤 노이즈)."""
+    curve = {"areas": CURVE_AREAS, "Our patch": [], "Random noise patch": []}
+    for a in CURVE_AREAS:
+        ours = banana_rate(model, dl, patch, (a, a), rot)[0]
+        rand = banana_rate(model, dl, noise, (a, a), rot)[0]
+        curve["Our patch"].append(ours)
+        curve["Random noise patch"].append(rand)
+        print(f"  area {a:5.1%}: ours {ours:6.1%} | noise {rand:6.1%}", flush=True)
+    return curve
 
 
 def main():
@@ -123,15 +147,9 @@ def main():
             print(f"{name:13s} | {cname:18s} | banana {rate:6.1%} | mean p(banana) {prob:.3f}", flush=True)
         results["models"][name] = row
 
-        if name == "ResNet-50":
-            curve = {"areas": CURVE_AREAS, "Our patch": [], "Random noise patch": []}
-            for a in CURVE_AREAS:
-                curve["Our patch"].append(banana_rate(model, dl, patch, (a, a), args.rot)[0])
-                curve["Random noise patch"].append(banana_rate(model, dl, noise, (a, a), args.rot)[0])
-                print(f"  area {a:5.1%}: ours {curve['Our patch'][-1]:6.1%} | "
-                      f"noise {curve['Random noise patch'][-1]:6.1%}", flush=True)
-            results["area_curve"] = curve
-            plot_area_curve(curve, f"{args.out}/area_curve.png")
+        if name == "ResNet-50":  # 공격 대상 모델만 추가 분석
+            results["area_curve"] = area_curve(model, dl, patch, noise, args.rot)
+            plot_area_curve(results["area_curve"], f"{args.out}/area_curve.png")
             plot_examples(model, ds, patch, args.rot, f"{args.out}/examples.png")
         del model
         if DEVICE == "cuda":
