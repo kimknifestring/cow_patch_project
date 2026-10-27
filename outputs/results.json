@@ -1,0 +1,104 @@
+{
+  "images": 1000,
+  "rot_deg": 45,
+  "area_range": [
+    0.1,
+    0.2
+  ],
+  "models": {
+    "ResNet-50": {
+      "No patch": {
+        "rate": 0.0,
+        "mean_prob": 0.00048610719665884974
+      },
+      "Random noise patch": {
+        "rate": 0.0,
+        "mean_prob": 0.0004216339960694313
+      },
+      "Our patch": {
+        "rate": 0.986,
+        "mean_prob": 0.9162141799926757
+      }
+    },
+    "VGG-16": {
+      "No patch": {
+        "rate": 0.0,
+        "mean_prob": 1.9527893426129595e-05
+      },
+      "Random noise patch": {
+        "rate": 0.0,
+        "mean_prob": 6.089901458472014e-05
+      },
+      "Our patch": {
+        "rate": 0.0,
+        "mean_prob": 0.00039235579781234266
+      }
+    },
+    "MobileNet-V2": {
+      "No patch": {
+        "rate": 0.0,
+        "mean_prob": 0.00032606202736496924
+      },
+      "Random noise patch": {
+        "rate": 0.0,
+        "mean_prob": 0.0002923162719234824
+      },
+      "Our patch": {
+        "rate": 0.051,
+        "mean_prob": 0.010630298107862472
+      }
+    },
+    "DenseNet-121": {
+      "No patch": {
+        "rate": 0.0,
+        "mean_prob": 5.909925373998703e-06
+      },
+      "Random noise patch": {
+        "rate": 0.0,
+        "mean_prob": 1.0666566726285964e-05
+      },
+      "Our patch": {
+        "rate": 0.038,
+        "mean_prob": 0.02295992523431778
+      }
+    }
+  },
+  "area_curve": {
+    "areas": [
+      0.02,
+      0.04,
+      0.06,
+      0.08,
+      0.1,
+      0.125,
+      0.15,
+      0.175,
+      0.2,
+      0.25
+    ],
+    "Our patch": [
+      0.0,
+      0.0,
+      0.007,
+      0.515,
+      0.904,
+      0.975,
+      0.991,
+      0.994,
+      0.996,
+      0.998
+    ],
+    "Random noise patch": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  }
+}
